@@ -1,0 +1,318 @@
+<!-- ============================== -->
+<!--                        		-->
+<!-- GAME.HTML    		      		-->
+<!--                   				-->
+<!-- ============================== -->
+<!DOCTYPE>
+<html>
+<head>
+	<title>Labyrinth</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	<link rel="stylesheet" href="style.css" />
+</head>
+<!-- ==============	-->
+<!-- BODY 			-->
+<!-- ==============	-->
+<body>
+<div id="gamecontainer" class="container">
+	<!-- OVERLAY - used for notifications -->
+	<div id="overlaydiv">
+		<div id="overlaytextdiv">
+			<span id="overlaytext"></span>
+		</div>
+	</div>
+
+	<!-- GAME BOARD --> 
+	<div id="gameboarddiv">
+		<div id="huddiv">
+			<div id="statsdiv">
+				<ul>
+					<li>
+						<span class="info">Time:</span>
+						<span class="info" id="time"></span>
+					</li>
+				</ul>
+			</div>
+		</div>
+		
+		<canvas id="gamecanvas"></canvas>
+	</div>
+</div>
+
+
+<!-- ============= -->
+<!-- JAVASCRIPT    -->
+<!-- ============= -->
+<script>
+// ==================================
+//
+// VARIABLES
+//
+// ==================================
+var ball = new Object;
+ball.radius = 10; 	// size of ball
+ball.posX = 50; 	// starting position 
+ball.posY = 50; 	// starting position 
+ball.tiltLR = 0; 	// how much the device is tilting (left/right)
+ball.tiltFB = 0; 	// how much the device is tilting (forward/backward)
+ball.dir = 0; 		// how much the device is rotated (unused)
+ball.centerLR; 		// defines the central position of the device (calibration)
+ball.centerFB; 		// defines the central position of the device (calibration)
+ball.color = 'grey';
+
+var game = new Object;
+game.timer;			// holds reference to timer
+game.time = 0; 		// time spent on current level
+game.mode = 1;		// 1 = phone, 2 = tablet
+game.pause = true;	
+
+// CANVAS
+// used to draw game field
+// canvas size is determined when device is rotated - see changeToLandscape
+var canvas = document.getElementById('gamecanvas');
+var canvasContext = canvas.getContext('2d');
+
+// ===============
+// PHONE v TABLET SETTINGS
+// ===============
+// size of game screen
+// set modes
+// set size of marble
+if (window.matchMedia) {
+	// PHONE
+	if (window.matchMedia('(max-device-width: 767px)').matches) {
+		ball.radius = 7;
+		game.mode = 1;
+	}
+	// TABLET
+	else if (window.matchMedia('(max-device-width: 1024px)').matches) {
+		ball.radius = 10;
+		game.mode = 2;
+	}
+}
+else {
+	//var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+}
+
+// ==================================
+//
+// ANIMATION
+//
+// ==================================
+// determine if animation is supported
+window.reqAnimFrame = window.mozRequestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.requestAnimationFrame || 
+                function(callback) {
+          			window.setTimeout(callback, 1000 / 60);
+        		};
+
+// helper function to start animation
+function animate() {
+	if (!game.pause) { 
+		// CLEAR SCREEN
+		canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+
+		// DRAW
+		drawBall();
+		reqAnimFrame(animate); // call animate again when browser is ready
+	}
+}
+
+// browser gets notified whenever device updates orientation
+if (window.DeviceOrientationEvent) {
+	window.addEventListener('deviceorientation', function(event) {
+		// phone
+		if (game.mode == 1) {
+			ball.tiltLR = event.gamma/2;
+			ball.tiltFB = event.beta/2;
+		}
+		// tablet
+		else if (game.mode == 2) {
+			ball.tiltLR = event.gamma;
+			ball.tiltFB = event.beta;
+		}
+
+		ball.dir = event.alpha;
+
+		// take window.orientation into account
+		switch(window.orientation) {  
+	  		case -90: // landscape
+	  			ball.tiltFB = -ball.tiltFB;
+	  			break;
+	 		case 90: // landscape
+	 			ball.tiltLR = -ball.tiltLR;
+	    		break; 
+	  		default: // portrait
+	    		break; 
+		}
+	}, true);
+}
+// MOZILLA
+else if (window.OrientationEvent) {
+}
+
+
+// draw starting position of ball
+function drawBallStart() {
+	canvasContext.beginPath();
+	canvasContext.arc(game.startX, game.startY, ball.radius, 0, 2 * Math.PI, false);
+	canvasContext.fillStyle = ball.color;
+	canvasContext.fill();
+}
+
+// draw new ball position - called by animate
+function drawBall() {
+	// calculate new ball position based on tilt
+	var new_posX = ball.posX + ball.tiltFB - ball.centerFB;
+    var new_posY = ball.posY + ball.tiltLR - ball.centerLR;
+
+	// wall boundaries
+	if (new_posY - ball.radius < 0)
+		new_posY = ball.radius;
+	else if (new_posY + ball.radius > canvas.height)
+		new_posY = canvas.height - ball.radius;
+	if (new_posX - ball.radius < 0)
+		new_posX = ball.radius;
+	else if (new_posX + ball.radius > canvas.width)
+		new_posX = canvas.width - ball.radius;
+
+	// draw
+    canvasContext.beginPath();
+	canvasContext.arc(new_posX, new_posY, ball.radius, 0, 2 * Math.PI, false);
+	canvasContext.fillStyle = ball.color;
+	canvasContext.fill();
+
+	// store current position
+	ball.posX = new_posX;
+	ball.posY = new_posY;
+}
+
+
+// ==================================
+//
+// GAME
+//
+// ==================================
+document.getElementById("time").innerHTML = game.time;
+
+function setupTimer() {
+	if (!game.timer) {
+		game.timer = window.setInterval(function () {
+			game.time += 1;
+			document.getElementById("time").innerHTML = game.time;
+		}, 1000);	
+	}
+}
+
+// ===============
+// PAUSE
+// ===============
+function recalibrate() {
+	// set center to current tilt position
+	ball.centerLR = ball.tiltLR;
+	ball.centerFB = ball.tiltFB;
+}
+function pause() {
+	game.pause = true;
+	clearInterval(game.timer);
+	game.timer = null;
+}
+function unpause() {
+	game.pause = false; 
+	recalibrate(); 
+	animate();
+	setupTimer(); 
+}
+
+
+// ==================================
+//
+// WINDOW MANAGEMENT
+//
+// ==================================
+// handles when orientation changes
+function orientationCheck() {
+	switch(window.orientation) {  
+  		case -90: // landscape
+  			changeToLandscape();
+  			break;
+ 		case 90: // landscape
+ 			changeToLandscape();
+    		break; 
+  		default: // portrait
+  			changeToPortrait();
+    		break; 
+	}
+}
+
+// sets settings for overlay div to respond to user touch
+function setOverlay() {
+	document.getElementById("overlaydiv").addEventListener('touchend', function() {
+		document.getElementById("overlaydiv").style.display = "none";
+		unpause();	
+	}, true);
+}
+
+// performs actions when orientation changes to portrait mode
+function changeToPortrait() {
+	pause();
+	document.getElementById("overlaytext").innerHTML = "Rotate to Landscape";
+	document.getElementById("overlaydiv").style.display = "table";
+	document.getElementById("gameboarddiv").style.display = "none";
+}
+
+// performs actions when orientation changes to landscape mode
+function changeToLandscape() {
+	document.getElementById("overlaytext").innerHTML = "Paused<br />Tap to Continue";
+	document.getElementById("overlaydiv").style.display = "table";
+	document.getElementById("gameboarddiv").style.display = "inline";
+	setOverlay();
+
+	if (window.matchMedia) {
+		// PHONE
+		if (window.matchMedia('(max-device-width: 767px)').matches) {
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight - 40;
+		}
+		// TABLET
+		else if (window.matchMedia('(max-device-width: 1024px)').matches) {
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight - 50;
+		}
+	}
+}
+
+// sets response to orientation change
+window.onorientationchange = function() { orientationCheck(); };
+
+// PREVENT SCROLLING OF WEB PAGE
+document.body.addEventListener('touchmove', function(event) {
+	event.preventDefault();
+}, false);
+
+// ==================================
+//
+// MAIN
+//
+// ==================================
+// ball begins moving after initial calibration (see window.addEventListener('deviceorientation')
+orientationCheck();
+drawBallStart();
+animate();
+
+
+// =======================
+// NOTE FOR DESKTOP USERS
+// =======================
+if (window.matchMedia) {
+	if (!window.matchMedia('(max-device-width: 767px)').matches && !window.matchMedia('(max-device-width: 1024px)').matches) {
+		document.getElementById("overlaytext").innerHTML = "This demo only works on a mobile device";
+	}
+}
+
+</script>
+</body>
+</html>
