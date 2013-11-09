@@ -190,6 +190,11 @@ function drawBall() {
 	ball.posY = new_posY;
 }
 
+function recalibrate() {
+	// set center to current tilt position
+	ball.centerLR = ball.tiltLR;
+	ball.centerFB = ball.tiltFB;
+}
 
 // ==================================
 //
@@ -207,19 +212,12 @@ function setupTimer() {
 	}
 }
 
-// ===============
-// PAUSE
-// ===============
-function recalibrate() {
-	// set center to current tilt position
-	ball.centerLR = ball.tiltLR;
-	ball.centerFB = ball.tiltFB;
-}
 function pause() {
 	game.pause = true;
 	clearInterval(game.timer);
 	game.timer = null;
 }
+
 function unpause() {
 	game.pause = false; 
 	recalibrate(); 
@@ -293,6 +291,7 @@ document.body.addEventListener('touchmove', function(event) {
 	event.preventDefault();
 }, false);
 
+
 // ==================================
 //
 // MAIN
@@ -304,12 +303,10 @@ drawBallStart();
 animate();
 
 
-// =======================
-// NOTE FOR DESKTOP USERS
-// =======================
-if (window.matchMedia) {
+// ===== NOTE FOR DESKTOP USERS
+if (window.matchMedia || !window.DeviceOrientationEvent) {
 	if (!window.matchMedia('(max-device-width: 767px)').matches && !window.matchMedia('(max-device-width: 1024px)').matches) {
-		document.getElementById("overlaytext").innerHTML = "This demo only works on a mobile device";
+		document.getElementById("overlaytext").innerHTML = "This device does not support Device Orientation";
 	}
 }
 
