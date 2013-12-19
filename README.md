@@ -7,6 +7,8 @@ After loading the demo, it will ask you to rotate your device to landscape mode.
 
 Each time you resume the demo from a paused state, it will recalibrate the center position based on how the device is held. 
 
+The demo can be found [here](http://mycowsworld.com/code/Labyrinth-Demo/).
+
 ## Documentation
 ### Media Queries
 This project used media queries to determine what kind of device is being used by the user. In CSS, different styles were applied based on the device type. For example, the first block would apply to phones, and the second block would apply to tablets. Note that if using a tablet, it would apply the phone styling first, then also apply the tablet styling on top of it. 
