@@ -1,4 +1,4 @@
-Labyrinth-Demo
+Labyrinth
 ==============
 This is a HTML5/Javascript project that demonstrates device orientation events. Note that the project was programmed such that it only works on a mobile device (e.g. phones, tablets). 
 
