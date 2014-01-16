@@ -112,12 +112,23 @@ window.reqAnimFrame = window.mozRequestAnimationFrame ||
 // helper function to start animation
 function animate() {
 	if (!game.pause) { 
-		// CLEAR SCREEN
-		canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+		// check for overlap
+		if (!checkOverlap()) {
+			// game over lawl
+			canvasContext.font="50px Arial";
+			canvasContext.textAlign="center";
+			canvasContext.fillStyle="black";
+			canvasContext.fillText("noob.", canvas.width/2, canvas.height/2);
+			pause();
+		}
+		else {
+			// DRAW BALL
+			canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+			drawBall();
+			drawBoard();
+			reqAnimFrame(animate); // call animate again when browser is ready
+		}
 
-		// DRAW
-		drawBall();
-		reqAnimFrame(animate); // call animate again when browser is ready
 	}
 }
 
@@ -161,6 +172,35 @@ function drawBallStart() {
 	canvasContext.arc(game.startX, game.startY, ball.radius, 0, 2 * Math.PI, false);
 	canvasContext.fillStyle = ball.color;
 	canvasContext.fill();
+}
+
+// draw board - called by animate
+function drawBoard() {
+	//draw rectangles to act as the board, stay away from them. 
+	canvasContext.fillStyle = "red";
+	var rectWidth = canvas.width/17;
+	var rectHeight = canvas.height/1.25;
+	canvasContext.fillRect(canvas.width/4, canvas.height/5, rectWidth, rectHeight);
+	canvasContext.fillRect(canvas.width/2.5, 0, rectWidth, rectHeight);
+	canvasContext.fillRect(canvas.width/1.82, canvas.height/5, rectWidth, rectHeight);
+	canvasContext.fillRect(canvas.width/1.43, 0, rectWidth, rectHeight);
+	canvasContext.fillRect(canvas.width/1.18, canvas.height/5, rectWidth, rectHeight);
+
+	//finish line
+	canvasContext.fillStyle = "yellow";
+	canvasContext.fillRect(canvas.width/1.18 + canvas.width/17, canvas.height/1.12, 100, 100);
+}
+
+// returns true if ball overlaps with rectangles - game over
+function checkOverlap() {
+	var sideFactor = (ball.radius/1.4142).toFixed(3);
+	var p = canvasContext.getImageData(ball.posX - sideFactor, ball.posY - sideFactor, sideFactor*2, sideFactor*2).data;
+	for (var i = 0; i < p.length; i += 4) {
+		if (p[i] == 255) {
+			return false;
+		}
+	}
+	return true;
 }
 
 // draw new ball position - called by animate
