@@ -7,7 +7,7 @@ After loading the demo, it will ask you to rotate your device to landscape mode.
 
 Each time you resume the demo from a paused state, it will recalibrate the center position based on how the device is held. 
 
-The demo can be found [here](http://mycowsworld.com/code/Labyrinth-Demo/).
+The demo can be found [here](http://mycowsworld.com/code/Labyrinth/).
 
 ## Documentation
 ### Media Queries
