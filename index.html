@@ -22,7 +22,7 @@
 		</div>
 	</div>
 
-	<!-- GAME BOARD --> 
+	<!-- GAME BOARD -->
 	<div id="gameboarddiv">
 		<div id="huddiv">
 			<div id="statsdiv">
@@ -34,7 +34,7 @@
 				</ul>
 			</div>
 		</div>
-		
+
 		<canvas id="gamecanvas"></canvas>
 	</div>
 </div>
@@ -51,8 +51,8 @@
 // ==================================
 var ball = new Object;
 ball.radius = 10; 	// size of ball
-ball.posX = 50; 	// starting position 
-ball.posY = 50; 	// starting position 
+ball.posX = 50; 	// starting position
+ball.posY = 50; 	// starting position
 ball.tiltLR = 0; 	// how much the device is tilting (left/right)
 ball.tiltFB = 0; 	// how much the device is tilting (forward/backward)
 ball.dir = 0; 		// how much the device is rotated (unused)
@@ -64,7 +64,7 @@ var game = new Object;
 game.timer;			// holds reference to timer
 game.time = 0; 		// time spent on current level
 game.mode = 1;		// 1 = phone, 2 = tablet
-game.pause = true;	
+game.pause = true;
 
 // CANVAS
 // used to draw game field
@@ -104,14 +104,14 @@ window.reqAnimFrame = window.mozRequestAnimationFrame ||
                 window.webkitRequestAnimationFrame ||
                 window.msRequestAnimationFrame ||
                 window.oRequestAnimationFrame ||
-                window.requestAnimationFrame || 
+                window.requestAnimationFrame ||
                 function(callback) {
           			window.setTimeout(callback, 1000 / 60);
         		};
 
 // helper function to start animation
 function animate() {
-	if (!game.pause) { 
+	if (!game.pause) {
 		// CLEAR SCREEN
 		canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -138,15 +138,15 @@ if (window.DeviceOrientationEvent) {
 		ball.dir = event.alpha;
 
 		// take window.orientation into account
-		switch(window.orientation) {  
+		switch(window.orientation) {
 	  		case -90: // landscape
 	  			ball.tiltFB = -ball.tiltFB;
 	  			break;
 	 		case 90: // landscape
 	 			ball.tiltLR = -ball.tiltLR;
-	    		break; 
+	    		break;
 	  		default: // portrait
-	    		break; 
+	    		break;
 		}
 	}, true);
 }
@@ -208,7 +208,7 @@ function setupTimer() {
 		game.timer = window.setInterval(function () {
 			game.time += 1;
 			document.getElementById("time").innerHTML = game.time;
-		}, 1000);	
+		}, 1000);
 	}
 }
 
@@ -219,10 +219,10 @@ function pause() {
 }
 
 function unpause() {
-	game.pause = false; 
-	recalibrate(); 
+	game.pause = false;
+	recalibrate();
 	animate();
-	setupTimer(); 
+	setupTimer();
 }
 
 
@@ -233,16 +233,16 @@ function unpause() {
 // ==================================
 // handles when orientation changes
 function orientationCheck() {
-	switch(window.orientation) {  
+	switch(window.orientation) {
   		case -90: // landscape
   			changeToLandscape();
   			break;
  		case 90: // landscape
  			changeToLandscape();
-    		break; 
+    		break;
   		default: // portrait
   			changeToPortrait();
-    		break; 
+    		break;
 	}
 }
 
@@ -250,7 +250,7 @@ function orientationCheck() {
 function setOverlay() {
 	document.getElementById("overlaydiv").addEventListener('touchend', function() {
 		document.getElementById("overlaydiv").style.display = "none";
-		unpause();	
+		unpause();
 	}, true);
 }
 
