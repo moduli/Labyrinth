@@ -1,4 +1,4 @@
-/* 
+/*
 // ====================
 //
 //	GENERAL
@@ -11,9 +11,9 @@
 	margin: 0px;
 	padding: 0px;
 }
-body { 
-	margin: 0px; 
-	padding: 0px; 
+body {
+	margin: 0px;
+	padding: 0px;
 }
 li {
 	list-style-type: none;
@@ -85,10 +85,10 @@ p, span, h1, th, td {
 
 /* ==== LANDSCAPE ==== */
 @media only screen and (orientation:landscape) {
-	
+
 }
 
-/* 
+/*
 // ====================
 //
 //	PHONE SPECIFIC
@@ -101,9 +101,9 @@ p, span, h1, th, td {
 	}
 }
 /* ==== PORTRAIT ==== */
-@media only screen and (min-device-width: 320px) and (orientation:portrait) {	
-	
-	
+@media only screen and (min-device-width: 320px) and (orientation:portrait) {
+
+
 }
 /* ==== LANDSCAPE ==== */
 @media only screen and (min-device-width: 320px) and (orientation:landscape) {
@@ -117,7 +117,7 @@ p, span, h1, th, td {
 }
 
 
-/* 
+/*
 // ====================
 //
 //	TABLET SPECIFIC
@@ -145,7 +145,7 @@ p, span, h1, th, td {
 	}
 }
 
-/* 
+/*
 // ====================
 //
 //	DESKTOP SPECIFIC
